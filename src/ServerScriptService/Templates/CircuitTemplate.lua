@@ -13,8 +13,8 @@ function Circuit.new(circuitID)
 	-- CircuitComponents store all components within this
 	-- Circuit
 	-- CircuitComponents is a dictionary
-	-- A key represents the componentID which is a string
-	-- A value represents the componentObject which is a
+	-- A key represents the ComponentID which is a string
+	-- A value represents the ComponentObject which is a
 	-- ComponentTemplate
 	self.CircuitComponents = {} 
 	--:: {[string]:component}

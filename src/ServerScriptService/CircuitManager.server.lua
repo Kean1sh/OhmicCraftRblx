@@ -20,9 +20,12 @@ local ComponentsFolder = workspace.Components
 -- A value represents the Circuit Object
 -- Example entry :
 -- {["Circuit1"] = Circuit1}
-local Circuits = {}
+local CircuitRepository = {}
 
-
+-- CreateComponentBlock creates the visuals of the physical object in the place
+-- CompID is the ID of the component which it will use as the name of the
+-- physical object
+-- 
 local function CreateComponentBlock(CompID,CompType,CompCFrame)
 	
 	local NewComponentBlock = ComponentBlocks:FindFirstChild(CompType):Clone()
@@ -34,22 +37,28 @@ local function CreateComponentBlock(CompID,CompType,CompCFrame)
 end
 
 
--- NewComponent adds and registers new components being
+-- NewComponentEntity adds and registers new components being
 -- added into the platform.
 -- Its purpose is to create a new circuit object and add
 -- that component into this new circuit.
 
 -- CompPos is a CFrame value, CFrame stores both position
 -- and orientation of a world object.
-local function NewComponent(Player,CompType,CompCFrame)
+local function NewComponentEntity(Player,CompType,CompCFrame)
 	-- GenerateGUID Generates a random 36 letter string ID
 	-- GenerateGUID(true) incldues curly brackets
 	-- GenerateGUID(false) does not include curly brackets
+
+	-- When a new component is created, we create IDs for
+	-- a new component and a new circuit.
 	local CompID = HttpService:GenerateGUID(false)
 	local CircuitID = HttpService:GenerateGUID(false)
 
+	-- We then create a new circuit object and pass the 
+	-- circuit ID
 	local NewCircuit = CircuitTemplate.new(CircuitID)
 	print(NewCircuit)
+	-- Add this new circuit to the CircuitRepository
 	AddCircuit(CircuitID,NewCircuit)
 
 	local NewComp = ComponentTemplate.new(CompID,CompType)
@@ -72,7 +81,7 @@ local function CreateWireBlock(WireID,Connector0Block,Connector1Block)
 
 end
 
-local function NewWire(Player,Connector0Block,Connector1Block)
+local function NewWireEntity(Player,Connector0Block,Connector1Block)
 	
 	local Component0ID = Connector0Block.Parent.Name
 	local Component1ID = Connector1Block.Parent.Name
@@ -85,13 +94,13 @@ local function NewWire(Player,Connector0Block,Connector1Block)
 	
 	print(Circuit0ID,Circuit1ID)
 	
-	if Circuits[Circuit0ID]:GetComponent(WireID) == nil then
-		Circuits[Circuit0ID]:AddComponent(WireID,WireComp,false)
+	if CircuitRepository[Circuit0ID]:GetComponent(WireID) == nil then
+		CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
 	end
 	
 	if Circuit0ID ~= Circuit1ID then
 		
-		MergeCircuits( Circuits[Circuit0ID], Circuits[Circuit1ID] )
+		MergeCircuits( CircuitRepository[Circuit0ID], CircuitRepository[Circuit1ID] )
 		
 	end
 	
@@ -133,15 +142,15 @@ end
 
 
 function RemoveCircuit(CircuitID)
-	Circuits[CircuitID] = nil
+	CircuitRepository[CircuitID] = nil
 end   
 
 function AddCircuit(CircuitID,CircuitObj)
-	Circuits[CircuitID] = CircuitObj
+	CircuitRepository[CircuitID] = CircuitObj
 end
 
 function FindCircuitWithComponent(CompID)
-	for circID,Circuit in pairs (Circuits) do
+	for circID,Circuit in pairs (CircuitRepository) do
 		
 		if Circuit:GetComponent(CompID) ~= nil then
 			
