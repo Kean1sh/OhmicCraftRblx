@@ -12,7 +12,6 @@ local ReplicatedStorage = game.ReplicatedStorage
 local EventStorage = ReplicatedStorage.EventStorage
 local WireBlock = ReplicatedStorage:FindFirstChild('Wire')
 local ComponentBlocks = ReplicatedStorage:FindFirstChild('ComponentBlocks')
-print('one piece!')
 local WireFolder = workspace.Wires
 local ComponentsFolder = workspace.Components
 
@@ -34,9 +33,6 @@ local function CreateComponentBlock(CompID,CompType,CompCFrame)
 	
 end
 
-local function poop()
-	print('poo')
-end
 
 -- NewComponent adds and registers new components being
 -- added into the platform.

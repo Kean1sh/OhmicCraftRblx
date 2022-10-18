@@ -1,6 +1,6 @@
 local Component = {}
 Component.__index = Component
-
+print('aaaa')
 
 -- Constructor -- 
 function Component.new(compID,compType)
