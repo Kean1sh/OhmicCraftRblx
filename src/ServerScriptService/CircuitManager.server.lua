@@ -10,7 +10,7 @@ local ComponentTemplate = require(ServerScriptService.Templates:FindFirstChild("
 local ReplicatedStorage = game.ReplicatedStorage
 
 local EventStorage = ReplicatedStorage.EventStorage
-local WireBlock = ReplicatedStorage:FindFirstChild('Wire')
+local WireBeam = ReplicatedStorage:FindFirstChild('Wire')
 local ComponentBlocks = ReplicatedStorage:FindFirstChild('ComponentBlocks')
 local WireFolder = workspace.Wires
 local ComponentsFolder = workspace.Components
@@ -35,7 +35,7 @@ local function CreateComponentBlock(CompID,CompType,CompCFrame)
 	-- block of CompType in ComponentBlocks.
 	local NewComponentBlock = ComponentBlocks:FindFirstChild(CompType):Clone()
 	
-	-- Set the parent to ComponentsFolder (located in workspace)
+	-- Set the parent of the instance to ComponentsFolder (located in workspace)
 	NewComponentBlock.Parent = ComponentsFolder
 	-- Set the name of the instance to the CompID
 	NewComponentBlock.Name = CompID
@@ -48,10 +48,17 @@ local function CreateComponentBlock(CompID,CompType,CompCFrame)
 end
 
 
--- NewComponentEntity adds and registers new components being
--- added into the platform.
+-- NewComponentEntity adds and registers new components entities
+-- being added into the platform.
 -- Its purpose is to create a new circuit object and add
 -- that component into this new circuit.
+
+-- As this function is activated when a remote event is sent
+-- by a localscript, the Player Object becomes automatically
+-- passed in by the system. This parameter is useful when server
+-- scripts want to identify which client fired the remote event.
+-- Player (Player) stores the player object of the client
+-- that sent this remote event
 
 -- CompType (string) is the type of the component.
 -- CompCFrame (CFrame), CFrame stores both position
@@ -88,49 +95,83 @@ local function NewComponentEntity(Player,CompType,CompCFrame)
 	CreateComponentBlock(CompID,CompType,CompCFrame)
 end
 
--- CreateWireBlock creates the visuals for a wire in the form of
+-- CreateWireBeam creates the visuals for a wire in the form of
 -- a beam object (a roblox object)
 -- Beams can be imagined as the line between to points, we call these
--- points "Attachments" which are also roblox objects. A beam requires
--- two Attachments otherwise it wouldn't appear properly.
+-- points "Attachments" which are also roblox objects. In this system
+-- we put an attachment within a connnector object.
 
 -- WireID (string) stores the ID of the wire.
-
+-- Connector0Block (BasePart) stores the Connector0 block
+-- Connector1Block (BasePart) stores the Connector1 block
 local function CreateWireBeam(WireID,Connector0Block,Connector1Block)
 
-	local NewWireBlock = WireBlock:Clone()
+	-- This creates a new wire beam instance by cloning
+	-- the original wire beam stored within ReplicatedStorage
+	local NewWireBeam = WireBeam:Clone()
 
-	NewWireBlock.Parent = WireFolder
-	NewWireBlock.Name = WireID
-	NewWireBlock.Attachment0 = Connector0Block.Attachment
-	NewWireBlock.Attachment1 = Connector1Block.Attachment
+	-- Set the parent of the new wire beam to WireFolder (in workspace)
+	NewWireBeam.Parent = WireFolder
+	-- Set the name of the new wire beam to the WireID
+	NewWireBeam.Name = WireID
+	-- We set the Attachment0 property of the new wire beam to the 
+	-- Attachment object of Connector0Block.
+	NewWireBeam.Attachment0 = Connector0Block.Attachment
+	-- We set the Attachment1 property of the new wire beam to the 
+	-- Attachment object of Connector1Block.
+	NewWireBeam.Attachment1 = Connector1Block.Attachment
 
 
 end
 
+-- NewComponentEntity adds and registers new wire entities being
+-- added into the platform.
+-- It could also merge the circuits of the components that this wire
+-- connects. 
+
+-- As this function is activated when a remote event is sent
+-- by a localscript, the Player Object becomes automatically
+-- passed in by the system. This parameter is useful when server
+-- scripts want to identify which client fired the remote event.
+-- Player (Player) stores the player object of the client
+-- that sent this remote event
+
+-- Connector0Block(BasePart) stores the Connector0's block object
+-- Connector1Block(BasePart) stores the Connector1's block object
+
 local function NewWireEntity(Player,Connector0Block,Connector1Block)
 	
+	-- Get the ID of the component block that contains Connector0Block
 	local Component0ID = Connector0Block.Parent.Name
+	-- Get the ID of the component block that contains Connector1Block
 	local Component1ID = Connector1Block.Parent.Name
 	
+	-- Get the circuit of component0, identified as Circuit0
 	local Circuit0ID = FindCircuitWithComponent(Component0ID)
+	-- Get the circuit of component1, identified as Circuit1
 	local Circuit1ID = FindCircuitWithComponent(Component1ID)
 	
-	local WireID = HttpService:GenerateGUID(false)
-	local WireComp = ComponentTemplate.new(WireID,"Wire")
-	
-	print(Circuit0ID,Circuit1ID)
-	
-	if CircuitRepository[Circuit0ID]:GetComponent(WireID) == nil then
-		CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
-	end
-	
+	-- If the two circuits aren't the same, we merge them. Circuit0 will
+	-- integrate Circuit1
 	if Circuit0ID ~= Circuit1ID then
-		
 		MergeCircuits( CircuitRepository[Circuit0ID], CircuitRepository[Circuit1ID] )
-		
 	end
+
+	print(Circuit0ID,Circuit1ID)
+	-- Generate a new ID for the wire entity
+	local WireID = HttpService:GenerateGUID(false)
+	-- Create a new component entity by passing WireID and set the type as
+	-- "Wire". This will be the wire entity.
+	local WireComp = ComponentTemplate.new(WireID,"Wire")
+	-- Add this wire entity into Circuit0
+	CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
+	-- If Circuit0 does not already contain the wire component
+	--if CircuitRepository[Circuit0ID]:GetComponent(WireID) == nil then
+		--CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
+	--end
 	
+	-- Then we can call CreateWireBeam to create
+	-- the physical wire beam of this wire entity.
 	CreateWireBeam(WireID,Connector0Block,Connector1Block)
 	
 end
