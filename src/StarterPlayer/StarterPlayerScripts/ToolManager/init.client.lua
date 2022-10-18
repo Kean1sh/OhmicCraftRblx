@@ -17,6 +17,7 @@ local ActiveTool = ""
 -- each key represents the Enum keycode
 -- example :
 -- Enum.KeyCode.One means key 1 on the keyboard
+
 -- each value represents the tool name stored as a string
 -- Example Entry:
 -- [Enum.KeyCode.One] = "ComponentCreator"

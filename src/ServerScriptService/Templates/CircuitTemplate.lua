@@ -4,6 +4,8 @@ Circuit.__index = Circuit
 function Circuit.new(circuitID)
 	local self = setmetatable({},Circuit)
 
+	self._Updated = false::boolean
+
 	-- A route is a collection of components between two
 	-- intersection components
 	-- CircuitRoutes store the routes within the circuit
