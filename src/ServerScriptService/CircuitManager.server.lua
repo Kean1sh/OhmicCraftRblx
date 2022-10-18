@@ -23,16 +23,27 @@ local ComponentsFolder = workspace.Components
 local CircuitRepository = {}
 
 -- CreateComponentBlock creates the visuals of the physical object in the place
--- CompID is the ID of the component which it will use as the name of the
--- physical object
--- 
+-- CompID (string) is the ID of the component which it will use as the name
+-- of the new instance of the component block
+-- CompType (string) is the type of the component, which will be used to locate
+-- the model of that component type in ComponentBlocks.
+-- CompCFrame (CFrame) stores the location and orientation of
+-- where the new component block will be placed and oriented. 
 local function CreateComponentBlock(CompID,CompType,CompCFrame)
 	
+	-- Create a new instance of the component block by cloning the component
+	-- block of CompType in ComponentBlocks.
 	local NewComponentBlock = ComponentBlocks:FindFirstChild(CompType):Clone()
 	
+	-- Set the parent to ComponentsFolder (located in workspace)
 	NewComponentBlock.Parent = ComponentsFolder
+	-- Set the name of the instance to the CompID
 	NewComponentBlock.Name = CompID
+	-- Set the CFrame of the instance to CompCFrame
 	NewComponentBlock:PivotTo(CompCFrame) 
+
+	-- Note that a Model Object is a collection of roblox objects, 
+	-- so it does not have a (Position) property.
 	
 end
 
@@ -42,7 +53,8 @@ end
 -- Its purpose is to create a new circuit object and add
 -- that component into this new circuit.
 
--- CompPos is a CFrame value, CFrame stores both position
+-- CompType (string) is the type of the component.
+-- CompCFrame (CFrame), CFrame stores both position
 -- and orientation of a world object.
 local function NewComponentEntity(Player,CompType,CompCFrame)
 	-- GenerateGUID Generates a random 36 letter string ID
@@ -54,22 +66,37 @@ local function NewComponentEntity(Player,CompType,CompCFrame)
 	local CompID = HttpService:GenerateGUID(false)
 	local CircuitID = HttpService:GenerateGUID(false)
 
-	-- We then create a new circuit object and pass the 
-	-- circuit ID
+	-- We then create a new circuit entity object 
+	-- and pass in the CircuitID
 	local NewCircuit = CircuitTemplate.new(CircuitID)
 	print(NewCircuit)
 	-- Add this new circuit to the CircuitRepository
 	AddCircuit(CircuitID,NewCircuit)
 
+	-- Create a new component entity object and pass
+	-- in the CompID and CompType
 	local NewComp = ComponentTemplate.new(CompID,CompType)
 	
 	print(NewComp)
-	NewCircuit:AddComponent(CompID,NewComp,true)
+	-- We then add this new component entity to the
+	-- new circuit entity.
+	NewCircuit:AddComponent(CompID,NewComp,false)
 	
+	-- Then we can call CreateComponentBlock to create
+	-- the physical component / component block of the
+	-- new component.
 	CreateComponentBlock(CompID,CompType,CompCFrame)
 end
 
-local function CreateWireBlock(WireID,Connector0Block,Connector1Block)
+-- CreateWireBlock creates the visuals for a wire in the form of
+-- a beam object (a roblox object)
+-- Beams can be imagined as the line between to points, we call these
+-- points "Attachments" which are also roblox objects. A beam requires
+-- two Attachments otherwise it wouldn't appear properly.
+
+-- WireID (string) stores the ID of the wire.
+
+local function CreateWireBeam(WireID,Connector0Block,Connector1Block)
 
 	local NewWireBlock = WireBlock:Clone()
 
@@ -104,7 +131,7 @@ local function NewWireEntity(Player,Connector0Block,Connector1Block)
 		
 	end
 	
-	CreateWireBlock(WireID,Connector0Block,Connector1Block)
+	CreateWireBeam(WireID,Connector0Block,Connector1Block)
 	
 end
 
