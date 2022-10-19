@@ -139,38 +139,42 @@ end
 -- Connector0Block(BasePart) stores the Connector0's block object
 -- Connector1Block(BasePart) stores the Connector1's block object
 
-local function NewWireEntity(Player,Connector0Block,Connector1Block)
+local function NewWireEntity(Player,NegativeConnector,PositiveConnector)
 	
 	-- Get the ID of the component block that contains Connector0Block
-	local Component0ID = Connector0Block.Parent.Name
+	local Component1ID = NegativeConnector.Parent.Name
 	-- Get the ID of the component block that contains Connector1Block
-	local Component1ID = Connector1Block.Parent.Name
+	local Component2ID = PositiveConnector.Parent.Name
+	
+	local NegativeConnectorName = NegativeConnector.Name
+	local PositiveConnectorName = PositiveConnector.Name
+	
 	
 	-- Get the circuit of component0, identified as Circuit0
-	local Circuit0ID = FindCircuitWithComponent(Component0ID)
-	-- Get the circuit of component1, identified as Circuit1
 	local Circuit1ID = FindCircuitWithComponent(Component1ID)
+	-- Get the circuit of component1, identified as Circuit1
+	local Circuit2ID = FindCircuitWithComponent(Component2ID)
 	
 	
 	
 	-- If the two circuits aren't the same, we merge them. Circuit0 will
 	-- integrate Circuit1
-	if Circuit0ID ~= Circuit1ID then
-		MergeCircuits( CircuitRepository[Circuit0ID], CircuitRepository[Circuit1ID] )
+	if Circuit1ID ~= Circuit2ID then
+		MergeCircuits( CircuitRepository[Circuit1ID], CircuitRepository[Circuit2ID] )
 	end
 
 	-- Set the connections of both components to each other.
-	Circuit0:GetComponent(Component0ID):SetConnection("Connector0",Component1ID)
-	Circuit0:GetComponent(Component1ID):SetConnection("Connector1",Component0ID)
+	CircuitRepository[Circuit1ID]:GetComponent(Component1ID):SetConnection(NegativeConnectorName,Component2ID)
+	CircuitRepository[Circuit1ID]:GetComponent(Component2ID):SetConnection(PositiveConnectorName,Component1ID)
 
-	print(Circuit0ID,Circuit1ID)
+	print(Circuit2ID,Circuit1ID)
 	-- Generate a new ID for the wire entity
 	local WireID = HttpService:GenerateGUID(false)
 	-- Create a new component entity by passing WireID and set the type as
 	-- "Wire". This will be the wire entity.
 	local WireComp = ComponentTemplate.new(WireID,"Wire")
 	-- Add this wire entity into Circuit0
-	CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
+	CircuitRepository[Circuit1ID]:AddComponent(WireID,WireComp,false)
 	-- If Circuit0 does not already contain the wire component
 	--if CircuitRepository[Circuit0ID]:GetComponent(WireID) == nil then
 		--CircuitRepository[Circuit0ID]:AddComponent(WireID,WireComp,false)
@@ -178,7 +182,7 @@ local function NewWireEntity(Player,Connector0Block,Connector1Block)
 	
 	-- Then we can call CreateWireBeam to create
 	-- the physical wire beam of this wire entity.
-	CreateWireBeam(WireID,Connector0Block,Connector1Block)
+	CreateWireBeam(WireID,NegativeConnector,PositiveConnector)
 	
 end
 
@@ -237,5 +241,5 @@ function FindCircuitWithComponent(CompID)
 end
 
 
-EventStorage.RequestNewComponent.OnServerEvent:Connect(NewComponent)
-EventStorage.ConnectConnectors.OnServerEvent:Connect(NewWire)
+EventStorage.RequestNewComponent.OnServerEvent:Connect(NewComponentEntity)
+EventStorage.ConnectConnectors.OnServerEvent:Connect(NewWireEntity)

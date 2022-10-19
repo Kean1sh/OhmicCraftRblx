@@ -55,26 +55,33 @@ function WiringTool.SelectConnector(ActionName,State,InputObject)
 			
 			if  WiringTool.CanSelect == true then
 				if MouseRay.Instance.Name == 'Connector0' and MouseRay.Instance.Name ~= WiringTool.NegativeConnector then
-					
+					print(MouseRay.Instance.Parent)
 					WiringTool.NegativeConnector = MouseRay.Instance
 					
 				elseif MouseRay.Instance.Name == 'Connector1' and MouseRay.Instance.Name ~= WiringTool.PositiveConnector then
-						
+					print(MouseRay.Instance.Parent)
 					WiringTool.PositiveConnector = MouseRay.Instance
 					
 				end
 				
 				
-				if (WiringTool.NegativeConnector ~= nil) and (WiringTool.PositiveConnector ~= nil) then
-					
+				
+			end	
+				
+			if (WiringTool.NegativeConnector ~= nil) and (WiringTool.PositiveConnector ~= nil) then
+				
+				if (WiringTool.PositiveConnector.Parent == WiringTool.NegativeConnector.Parent) then
+					print ('Same Block')
+				else
 					print('Connecting')
 					print(WiringTool.NegativeConnector,WiringTool.PositiveConnector)
 					ConnectConnectors:FireServer(WiringTool.NegativeConnector,WiringTool.PositiveConnector)
-					
+				end
+				
 					WiringTool.NegativeConnector = nil
 					WiringTool.PositiveConnector = nil
 					
-				end
+			
 				
 			end
 		end
