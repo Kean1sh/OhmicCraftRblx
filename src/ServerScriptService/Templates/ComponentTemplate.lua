@@ -15,6 +15,7 @@ function Component.new(compID,compType)
 
 	-- private example : self._Car
 	-- protected example : self.__Truck
+	self.Connections = {["Connector0"] = "", ["Connector1"] = ""}
 
 	-- = Component Data = --
 
@@ -32,6 +33,14 @@ function Component.new(compID,compType)
 end
 
 -- Setter functions -- 
+function Component.SetConnection(self,ConnectorVal,ConnectionID)
+	self.Connections[ConnectorVal] == ConnectionID
+end
+
+function Component.RemoveConnection(self,ConnectorVal)
+	self.Connections[ConnectorVal] = nil
+end
+
 function Component.SetIdeal(self,IdealVal)
 	self._Ideal = IdealVal
 end
@@ -48,7 +57,16 @@ function Component.SetCurrent(self,CurrentVal)
 	self._Current = CurrentVal
 end
 
--- Getter functions -- 
+-- Getter functions --
+
+function Component.GetAllConnections(self)
+	return self.Connections
+end
+
+function Component.GetConnection(self,ConnectorVal)
+	return self.Connections[ConnectorVal]
+end
+
 function Component.GetID(self) : string
 	return self._ComponentID
 end

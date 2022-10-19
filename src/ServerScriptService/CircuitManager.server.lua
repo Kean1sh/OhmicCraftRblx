@@ -151,11 +151,17 @@ local function NewWireEntity(Player,Connector0Block,Connector1Block)
 	-- Get the circuit of component1, identified as Circuit1
 	local Circuit1ID = FindCircuitWithComponent(Component1ID)
 	
+	
+	
 	-- If the two circuits aren't the same, we merge them. Circuit0 will
 	-- integrate Circuit1
 	if Circuit0ID ~= Circuit1ID then
 		MergeCircuits( CircuitRepository[Circuit0ID], CircuitRepository[Circuit1ID] )
 	end
+
+	-- Set the connections of both components to each other.
+	Circuit0:GetComponent(Component0ID):SetConnection("Connector0",Component1ID)
+	Circuit0:GetComponent(Component1ID):SetConnection("Connector1",Component0ID)
 
 	print(Circuit0ID,Circuit1ID)
 	-- Generate a new ID for the wire entity

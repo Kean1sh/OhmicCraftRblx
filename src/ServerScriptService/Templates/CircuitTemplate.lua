@@ -6,11 +6,11 @@ function Circuit.new(circuitID)
 
 	self._Updated = false::boolean
 
-	-- A route is a collection of components between two
+	-- A Branch is a collection of components between two
 	-- intersection components
-	-- CircuitRoutes store the routes within the circuit
-	-- CIrcuitRoutes is a list.
-	self.CircuitRoutes = {} :: {route}
+	-- CircuitBranch store the Branch within the circuit
+	-- CircuitBranch is a list.
+	self.CircuitBranch = {} :: {branch}
 
 	-- CircuitComponents store all components within this
 	-- Circuit
@@ -38,14 +38,14 @@ function Circuit.new(circuitID)
 	self.CircuitWires = {} :: {string}
 
 
-	-- Cycles are collections of routes that all lead back to
-	-- the same starting route.
+	-- Cycles are collections of branches that all lead back to
+	-- the same starting branch.
 	-- CircuitCyles store all the cycles within this Circuit.
 	-- In CircuitCycles stores the CycleID as a key and a
-	-- table with routeIDs as the value.
+	-- table with BranchIDs as the value.
 	-- CircuitCycles is a dictionary
 	-- A key in CircuitCyles stores nodeID, which is a string
-	-- A value in CircuitCyles stores the routeIDs, which is
+	-- A value in CircuitCyles stores the BranchIDs, which is
 	-- a table that only store strings
 	self.CircuitCycles = {} :: {[string]:{string}}
 
@@ -120,23 +120,13 @@ function Circuit.NewGraphEntry(self,NewNodeID,LastNodeID)
 	
 end
 
-function Circuit.GetComponent(self,CompID)
+function Circuit.UpdateCircuit(self)
 	
-	return self.CircuitComponents[CompID]
-	
-end
 
-function Circuit.GetAllComponents(self)
+end	
 
-	return self.CircuitComponents
 
-end
-
-function Circuit.GetID(self)
-
-	return self._CircuitID
-
-end
+-- Setter Functions --
 
 function Circuit.RemoveComponent(self,CompID,UpdateState)
 	self.CircuitComponents[CompID] = nil
@@ -155,5 +145,29 @@ function Circuit.AddComponent(self,CompID,CompObject,UpdateState)
 	end
 	
 end
+
+-- Getter Functions --
+
+function Circuit.GetComponent(self,CompID)
+	
+	return self.CircuitComponents[CompID]
+	
+end
+
+function Circuit.GetAllComponents(self)
+
+	return self.CircuitComponents
+
+end
+
+function Circuit.GetID(self)
+
+	return self._CircuitID
+
+end
+
+
+
+
 
 return Circuit
