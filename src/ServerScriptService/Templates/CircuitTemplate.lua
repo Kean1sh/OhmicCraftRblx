@@ -32,10 +32,10 @@ function Circuit.new(circuitID)
 	self.CircuitGraph = {} :: {[string]:{string}}
 
 
-	-- CircuitWires store all the visited wire components when
+	-- VisitedWires store all the visited wire components when
 	-- creating the graph.
-	-- CircuitWires is a list
-	self.CircuitWires = {} :: {string}
+	-- VisitedWires is a list
+	self.VisitedWires = {} :: {string}
 
 
 	-- Cycles are collections of branches that all lead back to
@@ -109,7 +109,7 @@ end
 
 
 -- This function creates a new entry for the CircuitGraph
-function Circuit.NewGraphEntry(self,NewNodeID,LastNodeID)
+function Circuit.NewGraphEntry(self,CurrentNodeID,LastNodeID)
 	
 	-- Create a new entry in the CircuitGraph with this new Node
 	-- and its new connection, the last Node.
@@ -119,6 +119,39 @@ function Circuit.NewGraphEntry(self,NewNodeID,LastNodeID)
 	self.CircuitGraph[LastNodeID].insert(NewNodeID)
 	
 end
+
+function Circuit.ComponentGraphTraversal(self,CurrentComponentID,LastNodeID)
+	if self.CircuitGraph[CurrentNodeID] == nil and self.VisitedWires[CurrentComponentID] == nil then
+		
+		local CurrentComponentEntity = Circuit.GetComponent(CurrentComponentID)
+		
+		if (CurrentComponentID:GetType == "Wire") then
+
+			Circuit.VisitedWires.insert(CurrentComponentID)
+
+			for ConnectorVal,ConnectionID in pairs (CurrentComponentEntity:GetAllConnections()) do
+				if self.CircuitGraph[CurrentComponentID][ConnectionID] == nil then
+					Circuit:TraverseThroughGraph(ConnectionID,LastNodeID)
+				end
+			end
+		end
+
+		else then
+
+			Circuit:NewGraphEntry(CurrentComponentID,LastNodeID)
+
+			for ConnectorVal,ConnectionID in pairs (CurrentComponentEntity:GetAllConnections()) do
+				if self.CircuitGraph[CurrentComponentID][ConnectionID] == nil then
+					self.CircuitGraph[CurrentComponentID].insert(ConnectionID)
+					Circuit:TraverseThroughGraph(ConnectionID,CurrentComponentID)
+				end
+			end
+		end
+	end
+end
+
+function Circuit.RemoveOutliers(self,CurrentNodeID,LastOutlierID)
+
 
 function Circuit.UpdateCircuit(self)
 	

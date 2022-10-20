@@ -173,6 +173,9 @@ local function NewWireEntity(Player,NegativeConnector,PositiveConnector)
 	-- Create a new component entity by passing WireID and set the type as
 	-- "Wire". This will be the wire entity.
 	local WireComp = ComponentTemplate.new(WireID,"Wire")
+
+	WireComp:SetConnection("Connector0",Component1ID)
+	WireComp:SetConnection("Connector1",Component2ID)
 	-- Add this wire entity into Circuit0
 	CircuitRepository[Circuit1ID]:AddComponent(WireID,WireComp,false)
 	-- If Circuit0 does not already contain the wire component
