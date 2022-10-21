@@ -164,8 +164,10 @@ local function NewWireEntity(Player,NegativeConnector,PositiveConnector)
 	end
 
 	-- Set the connections of both components to each other.
-	CircuitRepository[Circuit1ID]:GetComponent(Component1ID):SetConnection(NegativeConnectorName,Component2ID)
-	CircuitRepository[Circuit1ID]:GetComponent(Component2ID):SetConnection(PositiveConnectorName,Component1ID)
+	--CircuitRepository[Circuit1ID]:GetComponent(Component1ID):SetConnection(NegativeConnectorName,Component2ID)
+	--CircuitRepository[Circuit1ID]:GetComponent(Component2ID):SetConnection(PositiveConnectorName,Component1ID)
+
+	
 
 	print(Circuit2ID,Circuit1ID)
 	-- Generate a new ID for the wire entity
@@ -174,6 +176,11 @@ local function NewWireEntity(Player,NegativeConnector,PositiveConnector)
 	-- "Wire". This will be the wire entity.
 	local WireComp = ComponentTemplate.new(WireID,"Wire")
 
+	-- Set the connections of both components to the wire.
+	CircuitRepository[Circuit1ID]:GetComponent(Component1ID):SetConnection(NegativeConnectorName,WireID)
+	CircuitRepository[Circuit1ID]:GetComponent(Component2ID):SetConnection(PositiveConnectorName,WireID)
+
+	-- Set the connections of the wire to the two components
 	WireComp:SetConnection("Connector0",Component1ID)
 	WireComp:SetConnection("Connector1",Component2ID)
 	-- Add this wire entity into Circuit0

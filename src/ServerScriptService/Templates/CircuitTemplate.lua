@@ -150,7 +150,23 @@ function Circuit.ComponentGraphTraversal(self,CurrentComponentID,LastNodeID)
 	end
 end
 
-function Circuit.RemoveOutliers(self,CurrentNodeID,LastOutlierID)
+function Circuit.RemoveOutlier(self,CurrentNodeID,LastOutlierID)
+	local CurrentConnections = CircuitGraph[ConnectionID]
+	
+	if (#CurrentConnections <= 1) then
+
+		for ConnectorVal,ConnectionID in pairs (CurrentConnections) do
+			CircuitGraph[ConnectionID][CurrentNodeID]
+			Circuit.RemoveOutlier(self,ConnectionID,CurrentNodeID)
+			CircuitGraph[CurrentComponentID] = nil
+			
+			
+
+		end
+
+
+
+end
 
 
 function Circuit.UpdateCircuit(self)
